@@ -26,17 +26,17 @@ void initSdCardAndReport(){
   /*
   uint8_t bpc = vol.blocksPerCluster();
    //  PgmPrint("BlocksPerCluster: ");
-   
+
    //Serial.println(bpc, DEC);
-   
+
    uint8_t align = vol.dataStartBlock() & 0X3F;
    // PgmPrint("Data alignment: ");
    //Serial.println(align, DEC);
-   
+
    //  PgmPrint("sdCard size: ");
    //Serial.print(card.cardSize()/2000UL);
-   
-   
+
+
    if (align || bpc < 64) {
    //   PgmPrintln("\nFor best results use a 2 GB or larger card.");
    //// PgmPrintln("Format the card with 64 blocksPerCluster and alignment = 0.");
@@ -57,12 +57,12 @@ uint8_t playBegin(char* name,unsigned char _sound) {
   }
   else{
     //name
-    if (!file.open(&root,name, O_READ)) { 
+    if (!file.open(&root,name, O_READ)) {
       return false;
     }
     else{
       index[_sound]=root.curPosition()/32-1;
-      indexed(_sound,true); 
+      indexed(_sound,true);
     }
 
 
@@ -71,7 +71,7 @@ uint8_t playBegin(char* name,unsigned char _sound) {
 
 
   /*
-  if (!file.open(&root, name, O_READ)) { 
+  if (!file.open(&root, name, O_READ)) {
    // index[_sound
    // if (!file.open(&root, index, O_READ))
    //  PgmPrint("Can't open: ");
@@ -87,7 +87,7 @@ uint8_t playBegin(char* name,unsigned char _sound) {
     return false;
   }
   */
-  
+
  // loadValuesFromMemmory(activeSound);
 
   if (!wave.play(&file)) { //,uint32_t _pos=0
@@ -96,7 +96,7 @@ uint8_t playBegin(char* name,unsigned char _sound) {
     file.close();
     return false;
   }
-  
+
   //wave.pause(); //novinka
   return true;
 }
@@ -108,7 +108,7 @@ void error(char* str) {
   //  hw.initialize();
   hw.displayText(str);
   while(1){
-    hw.updateDisplay(); 
+    hw.updateDisplay();
   }
 }
 
@@ -135,7 +135,7 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
     file.close();
     if (SdFile::remove(&root, name)) {
       //  hw.displayText("redy");
-    } 
+    }
     else return;
 
     // return;
@@ -146,13 +146,21 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
     return;
   }
   wave.adcInit(RECORD_RATE, MIC_ANALOG_PIN, ADC_REFERENCE);
+
+  if(!wave.record(&file, RECORD_RATE, MIC_ANALOG_PIN, ADC_REFERENCE)) {
+   // hw.displayText("eror");
+    file.remove();
+    return;
+  }
+  wave.pause(); should be unnessesary -w
+
   hw.displayText("redy");
   hw.setLed(bigButton[_sound],true);
 
 
   while(1){
     updt++;
-    if(updt>3) updt=0, hw.updateDisplay(); 
+    if(updt>3) updt=0, hw.updateDisplay();
     hw.updateButtons();
     hw.updateDisplay();
 
@@ -179,19 +187,15 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
   }
   else recording=false,recSound=0,rec=false;
 
-  if(!wave.record(&file, RECORD_RATE, MIC_ANALOG_PIN, ADC_REFERENCE)) {
-   // hw.displayText("eror");
-    file.remove();
-    return;
-  } 
+  wve.resume();
   hw.dimForRecord(bigButton[_sound]);
 
   pinMode(6,INPUT_PULLUP);
 //  counter=1;
   while(!digitalRead(6));// counter++; //delay
-  while (wave.isRecording()) { //udělat něco jako delay   
-    if(!digitalRead(6)) wave.stop(); //hw.justPressed(REC)) 
-    
+  while (wave.isRecording()) { //udělat něco jako delay
+    if(!digitalRead(6)) wave.stop(); //hw.justPressed(REC))
+
   }
   wave.stop();
 
@@ -219,10 +223,5 @@ void chacha(){
   storePreset(currentBank,currentPreset);
   EEPROM.write(1001,currentBank);
   EEPROM.write(1002,currentPreset);
-  EEPROM.write(1000,1),software_Reset(); 
+  EEPROM.write(1000,1),software_Reset();
 }
-
-
-
-
-
