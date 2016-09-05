@@ -152,7 +152,7 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
     file.remove();
     return;
   }
-  wave.pause(); should be unnessesary -w
+  wave.pause();
 
   hw.displayText("redy");
   hw.setLed(bigButton[_sound],true);
@@ -187,7 +187,7 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
   }
   else recording=false,recSound=0,rec=false;
 
-  wve.resume();
+  wave.resume();
   hw.dimForRecord(bigButton[_sound]);
 
   pinMode(6,INPUT_PULLUP);
@@ -198,7 +198,6 @@ void trackRecord(unsigned char _sound,unsigned char _preset) {
 
   }
   wave.stop();
-
 
   wave.trim(&file);
   file.close();
