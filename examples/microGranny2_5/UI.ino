@@ -244,7 +244,7 @@ void loadValuesFromMemmory(unsigned char _sound){
 
 }
 int valueToSampleRate(int _value){
-  pitch=myMap(_value,1023,420);
+  pitch=myMap(_value,1023,480);
   if(tuned){
     pitch/=10;
     return (pgm_read_word_near(noteSampleRateTable+pitch));
